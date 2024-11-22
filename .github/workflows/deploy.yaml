@@ -18,10 +18,7 @@ jobs:
   check-changes:
     runs-on: ubuntu-latest
     outputs:
-      api-changed: ${{ steps.check.outputs.api }}
-      admin-changed: ${{ steps.check.outputs.admin }}
-      batch-changed: ${{ steps.check.outputs.batch }}
-      data-changed: ${{ steps.check.outputs.data }}
+      matrix: ${{ steps.check.outputs.matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
