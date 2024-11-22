@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ needs.check-changes.outputs.matrix }}
+        app: ${{ fromJson(needs.check-changes.outputs.matrix) }}
     steps:
       - name: Print
         run: |
