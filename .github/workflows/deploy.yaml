@@ -5,8 +5,15 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      is-manual:
+        type: choice
+        required: true
+        default: true
+        options:
+          - true
 
-run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
+run-name: '${{ github.workflow }} | ${{ github.event.inputs.is-manual }}'
 
 concurrency:
   group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
