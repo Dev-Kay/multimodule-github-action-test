@@ -1,6 +1,7 @@
 name: Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -15,7 +16,7 @@ env:
   APPS: "api admin batch"
 
 jobs:
-  check-changes:
+  filter-build-targets:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.check.outputs.matrix }}
@@ -25,21 +26,18 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Determine changed directories
+      - name: Filtering
         id: check
         run: |
-          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo 'true' || echo 'false')
+          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
 
           temp=()
-          if [ ${DATA_CHANGED} == 'true' ]; then
+          if [[ ${DATA_CHANGED} == 'true' ]]; then
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
               if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
-                echo "${APP} :: true"
                 temp+=(${APP})
-              else
-                echo "${APP} :: false"
               fi
             done
           fi
