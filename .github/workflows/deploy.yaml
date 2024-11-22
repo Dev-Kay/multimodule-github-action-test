@@ -49,7 +49,7 @@ jobs:
             done
           fi
           
-          echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")" >> $GITHUB_OUTPUT
+          echo "matrix=''" >> $GITHUB_OUTPUT
 
   print-test:
     needs: filter-build-targets
