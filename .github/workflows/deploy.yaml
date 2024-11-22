@@ -40,12 +40,13 @@ jobs:
     strategy:
       matrix:
         app: ["api", "admin", "batch"]
-    if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
     steps:
       - name: Checkout code
+        if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
         uses: actions/checkout@v3
 
       - name: Save deploy info
+        if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
         run: echo "${{ matrix.app }}_deploy_info=${{ matrix.app }}::1.0.0" >> $GITHUB_ENV
 
   print-deploy-info:
