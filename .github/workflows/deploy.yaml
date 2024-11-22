@@ -29,10 +29,10 @@ jobs:
       - name: Determine changed directories
         id: check
         run: |
-          API_CHANGED=$(git diff --name-only HEAD~1 | grep '^api/' || echo false)
-          ADMIN_CHANGED=$(git diff --name-only HEAD~1 | grep '^admin/' || echo false)
-          BATCH_CHANGED=$(git diff --name-only HEAD~1 | grep '^batch/' || echo false)
-          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep '^data/' || echo false)
+          API_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -q '^api/' && echo 'true' || echo 'false')
+          ADMIN_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -q '^admin/' && echo 'true' || echo 'false')
+          BATCH_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -q '^batch/' && echo 'true' || echo 'false')
+          DATA_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -q '^data/' && echo 'true' || echo 'false')
           
           echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
           
