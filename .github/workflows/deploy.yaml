@@ -31,9 +31,6 @@ jobs:
       - name: Determine changed directories
         id: check
         run: |
-#          API_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^api/' || echo false)
-#          ADMIN_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^admin/' || echo false)
-#          BATCH_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^batch/' || echo false)
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo 'true' || echo 'false')
 
           temp=()
