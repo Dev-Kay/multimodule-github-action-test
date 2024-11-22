@@ -37,7 +37,9 @@ jobs:
         id: check
         run: |
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
+          
           targets=()
+          
           if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
             targets=(${{ env.APPS }})
           else
@@ -47,7 +49,11 @@ jobs:
               fi
             done
           fi
-          echo ${targets[@]}
+          
+          if [ ${#targets[@]} -eq 0 ]; then
+            targets+=(none)
+          fi
+          
           echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")" >> $GITHUB_OUTPUT
   build-and-deploy:
     if: needs.filter-build-targets.outputs.matrix != ''
