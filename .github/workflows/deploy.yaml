@@ -47,6 +47,8 @@ jobs:
             done
           fi
           echo ${temp[@]}
+          MATRIX=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")
+          echo "${MATRIX}"
 #          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
 
 #
