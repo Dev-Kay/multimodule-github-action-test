@@ -38,12 +38,18 @@ jobs:
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
-              echo "git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false"
-              IS_RUN=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false)
-              echo "${IS_RUN}"
-              if [[ ${IS_RUN} == true ]]; then
+              if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
+                echo "${APP} :: true"
                 temp+=(${APP})
+              else
+                echo "${APP} :: false"
               fi
+#              echo "git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false"
+#              IS_RUN=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false)
+#              echo "${IS_RUN}"
+#              if [[ ${IS_RUN} == true ]]; then
+#                temp+=(${APP})
+#              fi
             done
           fi
           echo ${temp[@]}
