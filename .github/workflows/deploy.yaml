@@ -52,12 +52,12 @@ jobs:
           echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")" >> $GITHUB_OUTPUT
 
   build-and-deploy:
-    if: needs.check-changes.outputs.matrix != ''
+    if: needs.filter-build-targets.outputs.matrix != ''
     needs: filter-build-targets
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ fromJSON(needs.check-changes.outputs.matrix) }}
+        app: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
     steps:
       - name: Print
         run: |
