@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Print
         run: |
-          echo "${needs.check-changes.outputs.${{ matrix.app }}-changed}"
+          echo "${{ needs.check-changes.outputs.$matrix.app-changed }}"
 
       - name: Checkout code
         if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
