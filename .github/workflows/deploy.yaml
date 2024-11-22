@@ -49,9 +49,6 @@ jobs:
             done
           fi
           
-          if [ ${#targets[@]} -eq 0 ]; then
-            targets+=(none)
-          fi
           
           echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")" >> $GITHUB_OUTPUT
   build-and-deploy:
