@@ -16,7 +16,7 @@ on:
 run-name: ${{ github.workflow }} ${{ github.event.inputs.is-manual && ' | MANUAL' || ''}}
 
 concurrency:
-  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -37,65 +37,26 @@ jobs:
         id: check
         run: |
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
-
-          targets=()
-          if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
-            targets=(${{ env.APPS }})
+          temp=()
+          if [[ ${DATA_CHANGED} == true ]]; then
+            temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
               if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
-                targets+=(${APP})
+                temp+=(${APP})
               fi
             done
           fi
-          
-          if [ ${#targets[@]} -eq 0 ]; then
-            targets+=(none)
-          fi
-          
-          echo "matrix='$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")'" >> $GITHUB_OUTPUT
-
-  print-test:
-    needs: filter-build-targets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print
-        run: | 
-          echo "${{ needs.filter-build-targets.outputs.matrix }}"
-          echo "${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}"
-
+          echo ${temp[@]}
+          echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")" >> $GITHUB_OUTPUT
   build-and-deploy:
-    if: needs.filter-build-targets.outputs.matrix != '[]'
+    if: needs.filter-build-targets.outputs.matrix != ''
     needs: filter-build-targets
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ needs.filter-build-targets.outputs.matrix }}
-        exclude:
-          - app: none
+        app: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
     steps:
       - name: Print
         run: |
           echo "${{ matrix.app }}"
-#          echo "${{ needs.check-changes.outputs[format('{0}-changed', matrix.app)] }}"
-#
-#      - name: Checkout code
-#        if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
-#        uses: actions/checkout@v3
-#
-#      - name: Save deploy info
-#        if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
-#        run: echo "${{ matrix.app }}_deploy_info=${{ matrix.app }}::1.0.0" >> $GITHUB_ENV
-#
-#  print-deploy-info:
-#    needs: build-and-deploy
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Print
-#        run: |
-#          for APP in ${{ env.APPS }}; do
-#            IMAGE_URI=$(printenv "${APP}-deploy-info")
-#            if [ -n "$IMAGE_URI" ]; then
-#              echo "${APP}: ${IMAGE_URI}"
-#            fi
-#          done
