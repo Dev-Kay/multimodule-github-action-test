@@ -38,7 +38,7 @@ jobs:
         run: |
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
           temp=()
-          if [[ ${DATA_CHANGED} == true ]]; then
+          if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
