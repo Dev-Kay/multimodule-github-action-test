@@ -38,18 +38,22 @@ jobs:
         run: |
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
 
-          temp=()
+          targets=()
           if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
-            temp=(${{ env.APPS }})
+            targets=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
               if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
-                temp+=(${APP})
+                targets+=(${APP})
               fi
             done
           fi
           
-          echo "matrix='$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")'" >> $GITHUB_OUTPUT
+          if [ ${#targets[@]} -eq 0 ]; then
+            targets+=('none')
+          fi
+          
+          echo "matrix='$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")'" >> $GITHUB_OUTPUT
 
   print-test:
     needs: filter-build-targets
@@ -67,6 +71,8 @@ jobs:
     strategy:
       matrix:
         app: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
+        exclude:
+          - app: none
     steps:
       - name: Print
         run: |
