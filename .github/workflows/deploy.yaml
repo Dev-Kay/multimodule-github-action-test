@@ -1,10 +1,10 @@
 name: Deploy
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
 
