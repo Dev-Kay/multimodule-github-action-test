@@ -1,0 +1,62 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
+
+concurrency:
+  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APPS: "api admin batch"
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api-changed: ${{ steps.check.outputs.api }}
+      admin-changed: ${{ steps.check.outputs.admin }}
+      batch-changed: ${{ steps.check.outputs.batch }}
+      data-changed: ${{ steps.check.outputs.data }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Determine changed directories
+        id: check
+        run: |
+          echo "::set-output name=data::$(git diff --name-only HEAD~1 | grep '^data/' || echo false)"
+          echo "::set-output name=api::$(git diff --name-only HEAD~1 | grep '^api/' || echo false)"
+          echo "::set-output name=admin::$(git diff --name-only HEAD~1 | grep '^admin/' || echo false)"
+          echo "::set-output name=batch::$(git diff --name-only HEAD~1 | grep '^batch/' || echo false)"
+
+  build-and-deploy:
+    needs: check-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [${{ env.APPS }}]
+    if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Save deploy info
+        run: echo "${{ matrix.app }}_deploy_info=${{ matrix.app }}::1.0.0" >> $GITHUB_ENV
+
+  print-deploy-info:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        run: |
+          for APP in ${{ env.APPS }}; do
+            IMAGE_URI=$(printenv "${APP}-deploy-info")
+            if [ -n "$IMAGE_URI" ]; then
+              echo "${APP}: ${IMAGE_URI}"
+            fi
+          done
