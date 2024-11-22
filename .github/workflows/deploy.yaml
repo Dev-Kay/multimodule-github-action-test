@@ -16,7 +16,7 @@ on:
 run-name: ${{ github.workflow }} ${{ github.event.inputs.is-manual && ' | MANUAL' || ''}}
 
 concurrency:
-  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -36,12 +36,10 @@ jobs:
       - name: Filtering
         id: check
         run: |
-          echo "${{github.event.inputs.is-manual || false}}"
-          echo "${{github.event.inputs.is-manual || true}}"
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
 
           temp=()
-          if ${DATA_CHANGED}; then
+          if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
@@ -52,6 +50,13 @@ jobs:
           fi
           
           echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")" >> $GITHUB_OUTPUT
+
+  print-test:
+    needs: filter-build-targets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        run: echo "${{ needs.filter-build-targets.outputs.matrix }}"
 
   build-and-deploy:
     if: needs.filter-build-targets.outputs.matrix != ''
