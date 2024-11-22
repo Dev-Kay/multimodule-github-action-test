@@ -34,15 +34,24 @@ jobs:
           API_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^api/' || echo false)
           ADMIN_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^admin/' || echo false)
           BATCH_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^batch/' || echo false)
-          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' || echo false)
+          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo 'true' || echo 'false')
           
+          temp1=(${{ env.APPS }})
+          echo ${temp1[@]}
           temp=()
-          for APP in ${{ env.APPS }}; do
-            temp[${APP}]=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo 'true' || echo 'false')
-          done
-          
-          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
+          if [ ${DATA_CHANGED} == 'true' ]; then
+            temp=(${{ env.APPS }})
+          else
+            for APP in ${{ env.APPS }}; do
+              is-run=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo 'true' || echo 'false')
+              if [ ${is-run} == 'true' ]; then
+                temp+=(${APP})
+              fi
+            done
+          fi
           echo ${temp[@]}
+#          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
+
 #
 #  build-and-deploy:
 #    needs: check-changes
