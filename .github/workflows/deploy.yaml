@@ -44,9 +44,7 @@ jobs:
           else
             for APP in ${{ env.APPS }}; do
               is-run=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo 'true' || echo 'false')
-              if [ ${is-run} == 'true' ]; then
-                temp+=(${APP})
-              fi
+              echo ${is-run}
             done
           fi
           echo ${temp[@]}
