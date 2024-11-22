@@ -43,7 +43,7 @@ jobs:
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
-              IS_RUN=$(git diff --name-only HEAD~1 | grep -q '^${APP}/' && echo true || echo false)
+              IS_RUN=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false)
               echo "${IS_RUN}"
               if [[ ${IS_RUN} == true ]]; then
                 temp+=(${APP})
@@ -51,7 +51,7 @@ jobs:
             done
           fi
           echo ${temp[@]}
-#          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
+          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
 
 #
 #  build-and-deploy:
