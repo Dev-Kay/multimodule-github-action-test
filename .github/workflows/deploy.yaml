@@ -43,8 +43,7 @@ jobs:
     steps:
       - name: Print
         run: |
-          is-run=${{ ${{ format('needs.check-changes.outputs.{0}-changed', matrix.app) }} }}
-          echo "${ is-run }"
+          echo "$( ${{ format('needs.check-changes.outputs.{0}-changed', matrix.app) }} )"
 
       - name: Checkout code
         if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
