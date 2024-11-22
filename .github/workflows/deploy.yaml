@@ -36,7 +36,13 @@ jobs:
           BATCH_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^batch/' || echo false)
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' || echo false)
           
+          temp=()
+          for APP in ${{ env.APPS }}; do
+            temp[${APP}]=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo 'true' || echo 'false')
+          done
+          
           echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
+          echo ${temp[@]}
 #
 #  build-and-deploy:
 #    needs: check-changes
