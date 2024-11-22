@@ -61,7 +61,7 @@ jobs:
           echo "${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}"
 
   build-and-deploy:
-    if: ${{ needs.filter-build-targets.outputs.matrix != '[]' }}
+    if: needs.filter-build-targets.outputs.matrix != '[]'
     needs: filter-build-targets
     runs-on: ubuntu-latest
     strategy:
