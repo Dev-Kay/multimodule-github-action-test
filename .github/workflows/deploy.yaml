@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Print
         run: |
-          is-run=${ format('needs.check-changes.outputs.{0}-changed', matrix.app) }
+          is-run=$(format('needs.check-changes.outputs.{0}-changed', matrix.app))
           echo "${ is-run }"
 
       - name: Checkout code
