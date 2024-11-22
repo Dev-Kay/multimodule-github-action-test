@@ -50,6 +50,7 @@ jobs:
           fi
           
           echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")" >> $GITHUB_OUTPUT
+
   build-and-deploy:
     if: needs.filter-build-targets.outputs.matrix != '[]'
     needs: filter-build-targets
