@@ -56,7 +56,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print
-        run: echo "${{ needs.filter-build-targets.outputs.matrix }}"
+        run: | 
+          echo "${{ needs.filter-build-targets.outputs.matrix }}"
+          echo "${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}"
 
   build-and-deploy:
     if: needs.filter-build-targets.outputs.matrix != ''
