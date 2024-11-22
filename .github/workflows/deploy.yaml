@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print
-        run: echo "${{ needs.check-changes.outputs.matrix }}"
+        run: echo "${{ fromJSON(needs.check-changes.outputs.matrix) }}"
 
   build-and-deploy:
     needs: check-changes
