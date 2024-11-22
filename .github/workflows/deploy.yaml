@@ -13,7 +13,7 @@ on:
         options:
           - true
 
-run-name: "${{ github.workflow }} ${{ github.event.inputs.is-manual == 'true' && ' MANUAL' || ''}}"
+run-name: ${{ github.workflow }} ${{ github.event.inputs.is-manual == 'true' && ' MANUAL' || ''}}
 
 concurrency:
   group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
