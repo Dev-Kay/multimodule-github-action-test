@@ -36,10 +36,12 @@ jobs:
       - name: Filtering
         id: check
         run: |
+          echo "${{github.event.inputs.is-manual || false}}"
+          echo "${{github.event.inputs.is-manual || true}}"
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
 
           temp=()
-          if [[ ${DATA_CHANGED} == true || ${{github.event.inputs.is-manual}} == 'true' ]]; then
+          if ${DATA_CHANGED}; then
             temp=(${{ env.APPS }})
           else
             for APP in ${{ env.APPS }}; do
