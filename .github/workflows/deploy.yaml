@@ -47,20 +47,18 @@ jobs:
             done
           fi
           echo ${temp[@]}
-          MATRIX=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")
-          echo "${MATRIX}"
-#          echo "${API_CHANGED} || ${ADMIN_CHANGED} || ${BATCH_CHANGED} || ${DATA_CHANGED}"
+          echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${temp[@]}")" >> $GITHUB_OUTPUT
 
-#
-#  build-and-deploy:
-#    needs: check-changes
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        app: ["api", "admin", "batch"]
-#    steps:
-#      - name: Print
-#        run: |
+  build-and-deploy:
+    needs: check-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: ${{ needs.check-changes.outputs.matrix }}
+    steps:
+      - name: Print
+        run: |
+          echo "${{ matrix.app }}"
 #          echo "${{ needs.check-changes.outputs[format('{0}-changed', matrix.app)] }}"
 #
 #      - name: Checkout code
