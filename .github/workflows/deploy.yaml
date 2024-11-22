@@ -44,12 +44,6 @@ jobs:
               else
                 echo "${APP} :: false"
               fi
-#              echo "git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false"
-#              IS_RUN=$(git diff --name-only HEAD^ HEAD | grep -q '^${APP}/' && echo true || echo false)
-#              echo "${IS_RUN}"
-#              if [[ ${IS_RUN} == true ]]; then
-#                temp+=(${APP})
-#              fi
             done
           fi
           echo ${temp[@]}
