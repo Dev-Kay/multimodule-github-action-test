@@ -21,6 +21,14 @@ concurrency:
 
 env:
   APPS: "api admin batch"
+  names: |-
+    ${{ fromJson('{
+      "admin": "app-admin",
+      "front": "app-front",
+      "batch": "batch",
+      "api": "api"
+    }') }}
+  
 
 jobs:
   filter-build-targets:
@@ -62,3 +70,4 @@ jobs:
       - name: Print
         run: |
           echo "${{ matrix.app }}"
+          echo "${{ env.names[matrix.app] }}"
