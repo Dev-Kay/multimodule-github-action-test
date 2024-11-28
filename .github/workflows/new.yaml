@@ -12,7 +12,7 @@ concurrency:
 env:
   APPS: "api admin batch"
   KEY: "admin"
-  names: |-
+  names: |
     '{
       "admin": "app-admin",
       "front": "app-front",
