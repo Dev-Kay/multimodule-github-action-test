@@ -1,9 +1,6 @@
 name: NEW | Deploy
 
 on:
-  push:
-    branches:
-      - master
 
 concurrency:
   group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
