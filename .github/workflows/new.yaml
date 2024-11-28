@@ -12,13 +12,13 @@ concurrency:
 env:
   APPS: "api admin batch"
   KEY: "admin"
-  names: |
-    '{
+  names: |-
+    ${{ toJson('{
       "admin": "app-admin",
       "front": "app-front",
       "batch": "batch",
       "api": "api"
-    }'
+    }') }}
   
 
 jobs:
