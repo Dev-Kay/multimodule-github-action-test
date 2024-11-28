@@ -11,6 +11,7 @@ concurrency:
 
 env:
   APPS: "api admin batch"
+  KEY: "admin"
   names: |-
     '{
       "admin": "app-admin",
@@ -26,8 +27,6 @@ jobs:
     steps:
       - name: Print
         run: |
-          key='admin'
-          echo "${key}"
           echo "env.names :::: ${{ env.names }}"
           echo "env.names to JSON :::: ${{ fromJson(env.names) }}"
-          echo "env.names get admin :::: ${{ fromJson(env.names)[key] }}"
+          echo "env.names get admin :::: ${{ fromJson(env.names)[env.KEY] }}"
