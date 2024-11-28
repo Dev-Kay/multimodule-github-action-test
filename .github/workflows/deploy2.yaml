@@ -65,7 +65,7 @@ jobs:
           if $DATA_CHANGED || ${{ github.event.inputs.is-manual || false }}; then
             # Include all apps if manual trigger or data changes exist
             echo "전체 빌드"
-            matrix_json=$(echo "$apps_json" | jq -c .)
+            matrix_json=$apps_json
           else
             # Filter apps based on changes in corresponding directories
             for row in $(echo "$apps_json" | jq -c '.include[]'); do
@@ -77,7 +77,7 @@ jobs:
           fi
           
           # Output the resulting matrix JSON
-          echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "$matrix_json" | jq -c .)" >> $GITHUB_OUTPUT
       - name: Print
         run: echo "${{ fromJson(steps.check.outputs.matrix).include[0] }}"
 
