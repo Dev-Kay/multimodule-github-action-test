@@ -56,17 +56,19 @@ jobs:
 
       - name: Filtering
         id: check
+        env:
+          APPS_JSON: ${{ env.apps }}
         run: |
           # Parse `env.apps` into a JSON object
-          apps_json='${{ env.apps }}'
+          apps_json=$(echo "${APPS_JSON}" | jq .)
           
-          # Initialize matrix JSON
-          matrix_json='{"include": []}'
+          # Initialize matrix JSON as an empty JSON object
+          matrix_json=$(echo '{}' | jq '.include = []')
           
           # Check if there's any data change or manual trigger
           DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
           
-          if $DATA_CHANGED || ${{ github.event.inputs.is-manual || false }}; then
+          if $DATA_CHANGED || [ "${{ github.event.inputs.is-manual }}" = "true" ]; then
             # Include all apps if manual trigger or data changes exist
             matrix_json=$apps_json
           else
@@ -80,18 +82,19 @@ jobs:
           fi
           
           # Output the resulting matrix JSON
+          echo "$matrix_json" | jq . # Debug: Pretty print JSON
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
       - name: Print
-        run: echo "${{ fromJson(steps.check.outputs.matrix).include[0] }}"
+        run: echo "${{ steps.check.outputs.matrix.include[0] }}"
 
-  build-and-deploy:
-    if: ${{ fromJson(needs.filter-build-targets.outputs.matrix).include[0] }} != ''
-    needs: filter-build-targets
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
-    steps:
-      - name: Print
-        run: |
-          echo "${{ matrix.app }}"
-          echo "${{ matrix.name }}"
+  # build-and-deploy:
+  #   if: ${{ fromJson(needs.filter-build-targets.outputs.matrix).include[0] }} != ''
+  #   needs: filter-build-targets
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
+  #   steps:
+  #     - name: Print
+  #       run: |
+  #         echo "${{ matrix.app }}"
+  #         echo "${{ matrix.name }}"
