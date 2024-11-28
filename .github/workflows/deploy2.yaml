@@ -82,7 +82,7 @@ jobs:
           # Output the resulting matrix JSON
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
       - name: Print
-        run: echo "${{ steps.check.matrix }}
+        run: echo "${{ steps.check.outputs.matrix }}"
 
   build-and-deploy:
     if: needs.filter-build-targets.outputs.matrix != '[]'
