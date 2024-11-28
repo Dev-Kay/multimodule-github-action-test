@@ -56,8 +56,6 @@ jobs:
 
       - name: Filtering
         id: check
-        env:
-          APPS_JSON: ${{ env.apps }}
         run: |
           # Parse `env.apps` into a JSON object
           apps_json='${{ env.apps }}'
@@ -70,7 +68,7 @@ jobs:
           
           if $DATA_CHANGED || ${{ github.event.inputs.is-manual || false }}; then
             # Include all apps if manual trigger or data changes exist
-            matrix_json=$apps_json
+            matrix_json=${{ toJson(apps_json) }}
           else
             # Filter apps based on changes in corresponding directories
             for row in $(echo "$apps_json" | jq -c '.include[]'); do
