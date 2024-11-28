@@ -64,4 +64,6 @@ jobs:
       - name: Print
         run: |
           echo "${{ matrix.app }}"
-          echo "${{ fromJson(env.names)[matrix.app] }}"
+          echo "${{ fromJSON(env.names)[matrix.app] }}"
+          echo "${{ needs.filter-build-targets.outputs.matrix }}";
+          echo "${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
