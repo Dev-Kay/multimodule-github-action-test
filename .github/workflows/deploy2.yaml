@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy222
 
 on:
   push:
@@ -26,10 +26,6 @@ env:
           {
               "app": "admin",
               "name": "ADMIN"
-          },
-          {
-              "app": "front",
-              "name": "FRONT"
           },
           {
               "app": "batch",
