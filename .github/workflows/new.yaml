@@ -28,6 +28,5 @@ jobs:
     steps:
       - name: Print
         run: |
-          echo "${{ matrix.app }}"
-          echo "${{ env.names }}"
-          echo "${{ fromJson(env.names) }}"
+          echo "env.names :::: ${{ env.names }}"
+          echo "env.names to JSON :::: ${{ fromJson(env.names) }}"
