@@ -30,3 +30,4 @@ jobs:
         run: |
           echo "env.names :::: ${{ env.names }}"
           echo "env.names to JSON :::: ${{ fromJson(env.names) }}"
+          echo "env.names get admin :::: ${{ fromJson(env.names)['admin'] }}"
