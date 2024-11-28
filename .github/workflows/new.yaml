@@ -19,6 +19,13 @@ env:
       "batch": "batch",
       "api": "api"
     }') }}
+  sub-service-name: |-
+    ${{ fromJson('{
+      "ADMIN": "app-admin",
+      "FRONT": "app-front",
+      "BATCH": "batch",
+      "API": "api"
+    }')['ADMIN'] }}
   
 
 jobs:
@@ -30,3 +37,4 @@ jobs:
           echo "env.names :::: ${{ env.names }}"
           echo "env.names to JSON :::: ${{ fromJson(env.names) }}"
           echo "env.names get admin :::: ${{ fromJson(env.names)['front'] }}"
+          echo "sub-service-name :: ${{ env.sub-service-name }}"
