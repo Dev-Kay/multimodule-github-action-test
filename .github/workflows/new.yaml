@@ -5,8 +5,6 @@ on:
     branches:
       - master
 
-run-name: ${{ github.workflow }} ${{ github.event.inputs.is-manual && ' | MANUAL' || ''}}
-
 concurrency:
   group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -28,6 +26,6 @@ jobs:
     steps:
       - name: Print
         run: |
-          echo "env.names :::: ${{ env.names }}"
+          echo "env.names :::: ${{ env.names.admin }}"
           echo "env.names to JSON :::: ${{ fromJson(env.names) }}"
           echo "env.names get admin :::: ${{ fromJson(env.names)['admin'] }}"
