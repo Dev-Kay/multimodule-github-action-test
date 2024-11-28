@@ -84,14 +84,14 @@ jobs:
       - name: Print
         run: echo "${{ fromJson(steps.check.outputs.matrix).include[0] }}"
 
-  # build-and-deploy:
-  #   if: ${{ fromJson(needs.filter-build-targets.outputs.matrix).include && fromJson(needs.filter-build-targets.outputs.matrix).include | length > 0 }}
-  #   needs: filter-build-targets
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
-  #   steps:
-  #     - name: Print
-  #       run: |
-  #         echo "${{ matrix.app }}"
-  #         echo "${{ matrix.name }}"
+  build-and-deploy:
+    if: ${{ fromJson(steps.check.outputs.matrix).include[0] }} != ''
+    needs: filter-build-targets
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
+    steps:
+      - name: Print
+        run: |
+          echo "${{ matrix.app }}"
+          echo "${{ matrix.name }}"
