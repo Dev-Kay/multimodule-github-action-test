@@ -68,6 +68,7 @@ jobs:
           
           if $DATA_CHANGED || ${{ github.event.inputs.is-manual || false }}; then
             # Include all apps if manual trigger or data changes exist
+            echo "전체 빌드"
             matrix_json=${{ toJson(env.apps) }}
           else
             # Filter apps based on changes in corresponding directories
