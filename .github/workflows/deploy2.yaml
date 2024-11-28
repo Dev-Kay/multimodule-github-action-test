@@ -82,7 +82,7 @@ jobs:
           # Output the resulting matrix JSON
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
       - name: Print
-        run: echo "${{ fromJson(steps.check.outputs.matrix).include }}"
+        run: echo "${{ fromJson(steps.check.outputs.matrix).include[0] }}"
 
   # build-and-deploy:
   #   if: ${{ fromJson(needs.filter-build-targets.outputs.matrix).include && fromJson(needs.filter-build-targets.outputs.matrix).include | length > 0 }}
