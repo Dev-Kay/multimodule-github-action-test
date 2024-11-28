@@ -85,7 +85,7 @@ jobs:
         run: echo "${{ fromJson(steps.check.outputs.matrix).include[0] }}"
 
   build-and-deploy:
-    if: ${{ fromJson(steps.check.outputs.matrix).include[0] }} != ''
+    if: ${{ fromJson(needs.filter-build-targets.outputs.matrix).include[0] }} != ''
     needs: filter-build-targets
     runs-on: ubuntu-latest
     strategy:
