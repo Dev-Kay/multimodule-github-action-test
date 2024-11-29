@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ fromJson(env.APPS) }}
+        app: ["api", "admin", "batch"]
     steps:
       - name: Print
         run: echo "${{ matrix.app }}"
