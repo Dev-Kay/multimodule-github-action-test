@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ env.APPS }}]
+        app: ${{ env.APPS }}
     steps:
       - name: Print
         run: echo "${{ matrix.app }}"
