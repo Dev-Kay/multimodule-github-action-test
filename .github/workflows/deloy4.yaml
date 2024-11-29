@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
+
+concurrency:
+  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APPS: '["api", "admin", "batch"]'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: ${{ env.APPS }}]
+    steps:
+      - name: Print
+        run: echo "${{ matrix.app }}"
+
