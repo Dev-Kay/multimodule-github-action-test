@@ -12,14 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APPS: '["api", "admin", "batch"]'
+  APPS: "api admin batch"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ env.APPS }}
+        app: [${{ env.APPS }}]
     steps:
       - name: Print
         run: echo "${{ matrix.app }}"
