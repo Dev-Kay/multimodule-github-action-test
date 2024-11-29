@@ -66,7 +66,7 @@ jobs:
             matrix_json=$(echo "$matrix_json" | jq --argjson apps "$apps_json" '.include = $apps')
           else
             # Filter apps based on changes in corresponding directories
-            for row in $(echo "$apps_json" | jq -c ); do
+            for row in $(echo "$apps_json" | jq -c '.[]'); do
               app=$(echo "$row" | jq -r '.app')
               if git diff --name-only HEAD^ HEAD | grep -q "^${app}/"; then
                 matrix_json=$(echo "$matrix_json" | jq --argjson app_row "$row" '.include += [$app_row]')
