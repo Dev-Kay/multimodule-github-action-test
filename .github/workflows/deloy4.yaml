@@ -1,26 +1,98 @@
-name: Deploy
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - master
-
-run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
-
-concurrency:
-  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - main
+  pull_request:
+    types:
+      - closed
 
 env:
   APPS: "api admin batch"
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      data-changed: ${{ steps.check-data.outputs.data-changed }}
+      api-changed: ${{ steps.check-app.outputs.api-changed }}
+      admin-changed: ${{ steps.check-app.outputs.admin-changed }}
+      batch-changed: ${{ steps.check-app.outputs.batch-changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check if data changed
+        id: check-data
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep '^data/'; then
+            echo "data-changed=true" >> $GITHUB_ENV
+          else
+            echo "data-changed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Check if apps changed
+        id: check-app
+        run: |
+          for APP in ${{ env.APPS }}; do
+            if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
+              echo "${APP}-changed=true" >> $GITHUB_ENV
+            else
+              echo "${APP}-changed=false" >> $GITHUB_ENV
+            fi
+          done
+
   build-and-deploy:
+    needs: check-changes
     runs-on: ubuntu-latest
     strategy:
       matrix:
         app: [${{ env.APPS }}]
+    if: needs.check-changes.outputs.${{ matrix.app }}-changed == 'true' || needs.check-changes.outputs.data-changed == 'true'
     steps:
-      - name: Print
-        run: echo "${{ matrix.app }}"
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        id: build-push
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          AWS_REGION: your-aws-region
+          AWS_ACCOUNT_ID: your-aws-account-id
+        run: |
+          IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${{ matrix.app }}:${IMAGE_TAG}
+          docker build -t $IMAGE_URI ./${{ matrix.app }}
+          docker push $IMAGE_URI
+          echo "${{ matrix.app }}-deploy-info=${IMAGE_URI}" >> $GITHUB_ENV
+
+      - name: Collect deployment information
+        if: always()
+        run: echo "${{ matrix.app }}-deploy-info=${{ steps.build-push.outputs.image_uri }}" >> $GITHUB_ENV
+
+  notify-slack:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Slack message
+        run: |
+          SLACK_MESSAGE="배포가 완료되었습니다.\n"
+          for APP in ${{ env.APPS }}; do
+            IMAGE_URI=$(printenv "${APP}-deploy-info")
+            if [ -n "$IMAGE_URI" ]; then
+              SLACK_MESSAGE+="* ${APP}: ${IMAGE_URI}\n"
+            fi
+          done
+          echo "SLACK_MESSAGE=$SLACK_MESSAGE" >> $GITHUB_ENV
+
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: your-slack-channel-id
+          slack-message: ${{ env.SLACK_MESSAGE }}
+          env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
