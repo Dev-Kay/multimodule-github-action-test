@@ -1,0 +1,56 @@
+No:
+  name: 'no'
+  in: path
+  required: true
+  schema:
+    type: string
+    example: 'adeee7b2-81db-4cdd-a3e5-15a6a73380a4'
+    nullable: false
+
+CustomerId:
+  name: 'customer_id'
+  in: query
+  required: true
+  schema:
+    type: integer
+    format: int64
+    example: 12345
+    nullable: false
+
+MerchantTransactionId:
+  name: 'merchant_transaction_id'
+  in: query
+  required: false
+  schema:
+    type: string
+    example: 'adeee7b2-81db-4cdd-a3e5-15a6a73380a4'
+    nullable: true
+
+StartDate:
+  name: 'start_date'
+  in: query
+  required: true
+  schema:
+    type: string
+    example: '2024-01-01'
+    format: date
+    nullable: false
+
+EndDate:
+  name: 'end_date'
+  in: query
+  required: true
+  schema:
+    type: string
+    example: '2024-01-01'
+    format: date
+    nullable: false
+
+CategoryCode:
+  name: 'category_code'
+  in: query
+  required: false
+  schema:
+    type: string
+    example: 'REVIEW'
+    nullable: true

@@ -1,0 +1,13 @@
+fields:
+  PointTransactionType:
+    type: string
+    enum:
+      - CREATE
+      - USE
+      - DEDUCT
+      - CANCEL_CREATE
+      - CANCEL_USE
+      - CANCEL_DEDUCT
+    example: 'CREATE'
+    nullable: false
+

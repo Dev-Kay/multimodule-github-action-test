@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  # push:
+  #   branches:
+  #     - master
+  workflow_dispatch:
+    inputs:
+      is-manual:
+        type: choice
+        required: true
+        default: true
+        options:
+          - true
+
+run-name: ${{ github.workflow }} ${{ github.event.inputs.is-manual && ' | MANUAL' || ''}}
+
+concurrency:
+  group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APPS: "api admin batch"
+  names: '{"api": "API", "batch": "BATCH"}'
+  
+
+jobs:
+  filter-build-targets:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.check.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Filtering
+        id: check
+        run: |
+          DATA_CHANGED=$(git diff --name-only HEAD~1 | grep -q '^data/' && echo true || echo false)
+          
+          targets=()
+          if ${DATA_CHANGED} || ${{github.event.inputs.is-manual || false}}; then
+            targets=(${{ env.APPS }})
+          else
+            for APP in ${{ env.APPS }}; do
+              if git diff --name-only HEAD^ HEAD | grep "^${APP}/"; then
+                targets+=(${APP})
+              fi
+            done
+          fi
+          
+          echo "matrix=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${targets[@]}")" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    if: needs.filter-build-targets.outputs.matrix != '[]'
+    needs: filter-build-targets
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: ${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
+    steps:
+      - name: Print
+        run: |
+          echo "${{ matrix.app }}"
+          echo "${{ fromJSON(env.names)[matrix.app] }}"
+          echo "${{ needs.filter-build-targets.outputs.matrix }}";
+          echo "${{ fromJSON(needs.filter-build-targets.outputs.matrix) }}
