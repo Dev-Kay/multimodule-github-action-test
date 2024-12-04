@@ -1,9 +1,9 @@
 name: Deploy222
 
 on:
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - master
   workflow_dispatch:
     inputs:
       is-manual:

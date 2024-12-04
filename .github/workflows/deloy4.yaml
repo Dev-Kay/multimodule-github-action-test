@@ -1,9 +1,9 @@
 name: Deploy44444444
 
 on:
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - master
 
 run-name: '${{ github.workflow }} | ${{ github.event.inputs.app }} ${{ github.event.inputs.int-env }}'
 
