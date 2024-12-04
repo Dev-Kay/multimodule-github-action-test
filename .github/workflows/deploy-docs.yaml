@@ -31,28 +31,12 @@ jobs:
       - name: Swagger 경로 찾기
         id: find_path
         run: |
-          swagger_path=""
-          version_var="INPUT_${{ matrix.context | upper }}_VERSION"
-          version=${!version_var}
-
-          if [[ -z "$version" ]]; then
-            # 최신 버전 찾기
-            swagger_path=$(find ${{ matrix.context }}/src/main/resources/static/swagger -name spec.yaml | while read -r file; do
-              version=$(yq eval '.info.version' "$file");
-              echo "$version $file";
-            done | sort -V | tail -n 1 | awk '{print $2}')
-          else
-            # 입력받은 버전 찾기
-            swagger_path=$(find ${{ matrix.context }}/src/main/resources/static/swagger -name spec.yaml | while read -r file; do
-              version=$(yq eval '.info.version' "$file");
-              if [[ "$version" == "$version" ]]; then
-                echo "$file";
-              fi
-            done)
-          fi
-
-          if [[ -z "$swagger_path" ]]; then
-            echo "Swagger 파일을 찾을 수 없습니다: ${{ matrix.context }}" >&2
+          TARGET_DIR=${{ matrix.target }}/src/main/resources/static/swagger
+          INPUT_VERSION=${{ github.event.inputs[matrix.target + '_version'] || '.*' }}
+          SWAGGER_PATH=$(find $TARGET_DIR -type f -name "spec.yaml" | \
+                          xargs grep -l "version: $INPUT_VERSION" | sort | tail -n 1)
+          if [ -z "$SWAGGER_PATH" ]; then
+            echo "Error: Swagger 경로를 찾을 수 없습니다. 대상: ${{ matrix.target }}"
             exit 1
           fi
           echo "${{ matrix.target }}_path=$SWAGGER_PATH" >> $GITHUB_OUTPUT
