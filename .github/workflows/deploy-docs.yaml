@@ -19,8 +19,8 @@ jobs:
       matrix:
         target: [admin, api]
     outputs:
-      admin_path: ${{ steps.set-path.outputs.admin_path }}
-      api_path: ${{ steps.set-path.outputs.api_path }}
+      admin_path: ${{ steps.find_path.outputs.admin_path }}
+      api_path: ${{ steps.find_path.outputs.api_path }}
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v2
@@ -48,8 +48,8 @@ jobs:
       - name: Print
         run: |
           echo "${{ matrix.target }}_path"
-          echo "admin_path :: ${{steps.find_path.admin_path}}"
-          echo "api_path :: ${{steps.find_path.api_path}}"
+          echo "admin_path :: ${{steps.find_path.outputs.admin_path}}"
+          echo "api_path :: ${{steps.find_path.outputs.api_path}}"
 
   build-docker-images:
     needs: find-swagger-paths
