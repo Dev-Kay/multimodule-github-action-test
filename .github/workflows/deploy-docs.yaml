@@ -57,5 +57,5 @@ jobs:
 
       - name: Print
         run: |
-          echo "admin path :: ${{eeds.find-swagger-paths.outputs.admin_path}}"
-          echo "api path :: ${{eeds.find-swagger-paths.outputs.api_path}}"
+          echo "admin path :: ${{needs.find-swagger-paths.outputs.admin_path}}"
+          echo "api path :: ${{needs.find-swagger-paths.outputs.api_path}}"
