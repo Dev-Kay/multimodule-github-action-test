@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        context: [admin, api]
+        target: [admin, api]
     outputs:
       admin_path: ${{ steps.set-path.outputs.admin_path }}
       api_path: ${{ steps.set-path.outputs.api_path }}
@@ -32,6 +32,7 @@ jobs:
         id: find_path
         run: |
           TARGET_DIR=${{ matrix.target }}/src/main/resources/static/swagger
+          # INPUT_VERSION=${{ github.event.inputs[format('{0}_version', matrix.target)] || '.*' }}
           INPUT_VERSION=${{ github.event.inputs[matrix.target + '_version'] || '.*' }}
           SWAGGER_PATH=$(find $TARGET_DIR -type f -name "spec.yaml" | \
                           xargs grep -l "version: $INPUT_VERSION" | sort | tail -n 1)
