@@ -32,8 +32,8 @@ jobs:
         id: find_path
         run: |
           TARGET_DIR=${{ matrix.target }}/src/main/resources/static/swagger
-          # INPUT_VERSION=${{ github.event.inputs[format('{0}_version', matrix.target)] || '.*' }}
-          INPUT_VERSION=${{ github.event.inputs[matrix.target + '_version'] || '.*' }}
+          INPUT_VERSION=${{ github.event.inputs[format('{0}_version', matrix.target)] || '.*' }}
+          # INPUT_VERSION=${{ github.event.inputs[matrix.target + '_version'] || '.*' }}
           SWAGGER_PATH=$(find $TARGET_DIR -type f -name "spec.yaml" | \
                           xargs grep -l "version: $INPUT_VERSION" | sort | tail -n 1)
           if [ -z "$SWAGGER_PATH" ]; then
