@@ -44,6 +44,12 @@ jobs:
           fi
           echo "${{ matrix.target }}_path=$SWAGGER_PATH" >> $GITHUB_OUTPUT
 
+      - name: Print
+        run: |
+          echo "${{ matrix.target }}_path"
+          echo "admin_path :: ${{steps.find_path.admin_path}}"
+          echo "api_path :: ${{steps.find_path.api_path}}"
+
   build-docker-images:
     needs: find-swagger-paths
     runs-on: ubuntu-latest
