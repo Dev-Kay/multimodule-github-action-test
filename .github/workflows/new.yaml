@@ -1,7 +1,17 @@
 name: NEW | Deploy
 
 on:
-
+  workflow_dispatch:
+    inputs:
+      app:
+        type: choice
+        description: 'target application'
+        required: true
+        options:
+          - API
+          - ADMIN
+          - BATCH
+        
 concurrency:
   group: deploy-${{ github.event.inputs.int-env }}-${{ github.event.inputs.app }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -9,13 +19,24 @@ concurrency:
 env:
   APPS: "api admin batch"
   KEY: "admin"
-  names: |
-    {
-      "admin": "app-admin",
-      "front": "app-front",
-      "batch": "batch",
-      "api": "api"
-    }
+  names: |-
+    ${{ fromJson('{
+      "ADMIN": {
+            "app": "admin",
+            "service": "admin-api",
+            "name": "ADMIN"
+        },
+      "BATCH": {
+            "app": "batch",
+            "service": "batch",
+            "name": "BATCH"
+        },
+      "API": {
+            "app": "api",
+            "service": "api",
+            "name": "API"
+        }
+    }')[github.event.inputs.app] }}
 
 jobs:
   filter-build-targets:
@@ -27,4 +48,4 @@ jobs:
         run: |
           echo "env.names :::: $NAMES_JSON"
           echo "env.names to JSON :::: $(echo "$NAMES_JSON" | jq .)" # JSON 변환 후 출력
-          echo "env.names get front :::: $(echo "$NAMES_JSON" | jq -r '.front')" # 특정 키 값 출력
+          echo "env.names get front :::: $(echo "$NAMES_JSON" | jq -r '.app')" # 특정 키 값 출력
